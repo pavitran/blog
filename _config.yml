@@ -3,13 +3,14 @@ markdown:	redcarpet
 highlighter:	true
 
 # Permalinks
-permalink:	:title
+permalink:	/:title
 
 # Setup
 title:		Pavitran
 tagline:	'blog'
 description:	'My personal blog.'
-url:		http://pavitran.github.io/blog/
+url:		http://pavitran.github.io
+baseurl: /blog
 
 author:
   name:		'Pavitran Kalla'
