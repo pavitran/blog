@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+ <title>Pavitran</title>
+ <link href="http://localhost:4000/atom.xml" rel="self"/>
+ <link href="http://localhost:4000/"/>
+ <updated>2017-11-05T02:36:43+05:30</updated>
+ <id>http://localhost:4000</id>
+ <author>
+   <name>Pavitran Kalla</name>
+   <email></email>
+ </author>
+
+ 
+ <entry>
+   <title>Hooking up with Git Hooks</title>
+   <link href="http://localhost:4000/hooking-up-with-git-hooks"/>
+   <updated>2017-10-29T00:00:00+05:30</updated>
+   <id>http://localhost:4000/hooking-up-with-git-hooks</id>
+   <content type="html">&lt;p&gt;Even though the title is a bit weird, you might have already guessed what this article is about. Yeah, &amp;quot;Git&amp;quot; Sometimes no matter how much you explore a tool or a software, there are still surprises in its pocket. One such tool is Git. Yup, the nifty Version Control System(VSC) which is most popular and most used among software developer(the smart ones), It might have saved lots of butts from getting busted, at least it did save mine a lot. Don&amp;#39;t know how many lives those &lt;code&gt;git reset&lt;/code&gt;,&lt;code&gt;git revert&lt;/code&gt; and &lt;code&gt;git checkout&lt;/code&gt; has saved.
+Use Git Properly and it makes your life as a software developer so much easier, and If you are not using it already be prepared for the horrors. But I’m not here to praise Git, am I? I&amp;#39;m here to talk about a feature that was there forever but I&amp;#39;ve come across it in the recent days.
+I&amp;#39;m talking about &lt;code&gt;Git Hooks&lt;/code&gt;, What are they? How could they of be use to you? How I&amp;#39;ve used them? Let&amp;#39;s find out..&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;Git Hooks&lt;/code&gt; are just Bash Script files that you could execute whenever a certain event occurs. Well, What kind of events exactly?🤔
+When using &lt;code&gt;Git&lt;/code&gt; there are a lot of events.    &lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;we run &lt;code&gt;git add .&lt;/code&gt; to stage the files for the commit, that&amp;#39;s an event&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;we store the changes to the local repo with &lt;code&gt;git commit -m &amp;quot;first commit&amp;quot;&lt;/code&gt;, this is an event&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;we push the changes to the remote repo with &lt;code&gt;git push&lt;/code&gt;, that&amp;#39;s an event as well&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;For this article, let&amp;#39;s concentrate  on the last two. Now let&amp;#39;s see some of the cases where &lt;code&gt;Git Hooks&lt;/code&gt; might be useful..&lt;/p&gt;
+
+&lt;h3&gt;Use cases&lt;/h3&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;changing credentials when committing code&lt;/strong&gt;&lt;br&gt;
+This happens to me often, I&amp;#39;ve been working on website locally firing up a local database server, and have my app connected to it. My development is done, and again when I&amp;#39;m commiting the code I&amp;#39;ve to change the database link, credentials manually. Not much of a hassel, but could be automated.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;prettifying code before committing&lt;/strong&gt;&lt;br&gt;
+Whenever I&amp;#39;m writing code my top most prioroty is getting it to work, So I don&amp;#39;t care about those beautiful indentations and perfectly alligned curly braces. But since I&amp;#39;m sharing code with others, before comitting it I have to go on and adjust all the code to make it look pretty. this is somewhat tidious job, so should be automated.(or rather learn to write nicely intdented code stupid😆)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;custom notification system for push&lt;/strong&gt;&lt;br&gt;
+Github has many kinds of notifications, so whenever one of your collaborator has pushed some new changes you get a notification. But wait what if you are not using Github and have hosted your own remote repo, or what if you are using Github but still want to be notified of changes by some other means. We can use &lt;code&gt;Git Hooks&lt;/code&gt; for that as well.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Well mate we&amp;#39;ve talked all about what  they can do, but there&amp;#39;s still one thing that&amp;#39;s bugging me. Why haven&amp;#39;t I seen them even though I&amp;#39;ve been working with Git for a while?&lt;br&gt;
+Good question! Well they have been there forever hiding under plain sight. Now let&amp;#39;s get into some technical stuff, let&amp;#39;s see how we can write &lt;code&gt;Git Hooks&lt;/code&gt; with the above three Usecases in mind.&lt;br&gt;
+When you do a &lt;code&gt;git init&lt;/code&gt; or a &lt;code&gt;git pull&lt;/code&gt;, Git creates a directory called &lt;code&gt;.git&lt;/code&gt; in the root directory. This is where all the data regarding our repo are stored. If you can&amp;#39;t see the directory, it&amp;#39;s probobly been hidden(by default). Unhide the directory according to your operating systeam and get into it, you&amp;#39;ll see that it has the following file structure  &lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;.git
+└─── hooks
+└─── info
+└─── logs
+└─── objects
+└─── refs
+│   COMMIT_EDITMSG    
+│   config    
+│   description
+│   HEAD
+│   index
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;p&gt;Here &lt;code&gt;hooks&lt;/code&gt; directory is all we care about, but let&amp;#39;s briefly go through what all these files and directories are about. &lt;code&gt;index&lt;/code&gt; file contains all the details about the files the directory, &lt;code&gt;HEAD&lt;/code&gt; contains the name of the head we are at, &lt;code&gt;description&lt;/code&gt; contains the description of our repo like the name, &lt;code&gt;config&lt;/code&gt; obviously contains the configuration of out repo, &lt;code&gt;COMMIT_EDITMSG&lt;/code&gt; contains the commit message of our last commit.&lt;br&gt;
+Now Let&amp;#39;s come to the directories, &lt;code&gt;refs&lt;/code&gt; directory contains the raw SHA1 values, &lt;code&gt;objects&lt;/code&gt; is the directory where all the Blobs with the info of commits are stored, &lt;code&gt;logs&lt;/code&gt; are again logs and &lt;code&gt;info&lt;/code&gt; is just info.
+At Last we come to the star of our show the &lt;code&gt;hooks&lt;/code&gt;, open up the directory and you&amp;#39;d see a bunch of file with an extension &lt;code&gt;.sample&lt;/code&gt;. The names of files map to kind of event that triggers the hook, for example &lt;code&gt;pre-applypatch.sample&lt;/code&gt; would be executed before a new patch is being applied, whereas &lt;code&gt;post-checkout&lt;/code&gt; executed after we have run &lt;code&gt;git checkout&lt;/code&gt;.&lt;br&gt;
+Now let&amp;#39;s take the use cases from above and let&amp;#39;s write three different &lt;code&gt;Git Hooks&lt;/code&gt; that help us in three different ways..    &lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Different credentials for dev and production&lt;/strong&gt;&lt;br&gt;
+I usually have different credentials file for dev and production, let&amp;#39;s call them &lt;code&gt;credentials.json&lt;/code&gt; and &lt;code&gt;credentials-dev.json&lt;/code&gt;. Now we usually have to switch them before commiting the code, let&amp;#39;s automate it with hooks..  &lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;In the current &lt;code&gt;hooks&lt;/code&gt; directory you&amp;#39;d have a file with the name &lt;code&gt;pre-commit.sample&lt;/code&gt;, remove the &lt;code&gt;.sample&lt;/code&gt; extension, save and open up the file in your favourite text editor. You should see some sample bash script, let&amp;#39;s ignore it for now and remove all the content&amp;#39;s of the file(except the &lt;code&gt;#!/bin/sh&lt;/code&gt;). Now let&amp;#39;s assume you are working with a node project and in your project directory have a &lt;code&gt;index.js&lt;/code&gt; file, this is the file in which we require the credentials. Let&amp;#39;s switch the occurances of &lt;code&gt;credentials-dev.json&lt;/code&gt; with &lt;code&gt;credentials.json&lt;/code&gt; using sed..&lt;br&gt;
+&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;
+sed -i &amp;quot;s/credentials-dev.json/credentials.json/g&amp;quot; ./src/index.js&lt;br&gt;
+git add ./src/index.js&lt;br&gt;
+&lt;/code&gt;&lt;/pre&gt;
+This would replace all the occurance of our dev credentials with production credentials, and the next line &lt;code&gt;git add ./src/index.js&lt;/code&gt; to add the chaged file back to the staging, you could do &lt;code&gt;git add .&lt;/code&gt; if you are updating multiple files in the hooks. Save it, try commiting the code and you should see the changes in the file.&lt;br&gt;&lt;/li&gt;
+&lt;li&gt;We just switched the credentials to production, but wait again for development you have to switch them back manually, seems inefficient🤔. Let&amp;#39;s improvise it. Create a new hook that changes back the production credentials to dev, in same &lt;code&gt;hooks&lt;/code&gt; directory create a new file &lt;code&gt;post-commit&lt;/code&gt;(without any extension). open the file in editor and add &lt;code&gt;#!/bin/sh&lt;/code&gt; on top, again just one line which does the exact opposite.&lt;br&gt;
+&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;
+sed -i &amp;quot;s/credentials.json/credentials-dev.json/g&amp;quot; ./src/index.js
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;That&amp;#39;s all, try commiting the code and you should see no changes in the &lt;code&gt;index.js&lt;/code&gt;. Why? Because even though we change it before the commit with &lt;code&gt;pre-commit&lt;/code&gt; hook, we changed it back with &lt;code&gt;post-commit&lt;/code&gt; hook. Do a quick &lt;code&gt;git diff&lt;/code&gt; and you should see that the last commit really did change to production credentials.&lt;br&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Prettifying code before committing&lt;/strong&gt;&lt;br&gt;
+This is another common one, I sometimes start with the prittiest code possible and as I progress it turns into something else. Let&amp;#39;s use a &lt;code&gt;pre-commit&lt;/code&gt; hook for this&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Since we are working with node, there&amp;#39;s an awesome node module &lt;a href=&quot;https://github.com/prettier/prettier#option-3-bash-script&quot;&gt;prettier&lt;/a&gt;, that makes all your javascript prettier. install it with &lt;code&gt;npm install --save-dev --save-exact prettier&lt;/code&gt;, now let&amp;#39;s go to our &lt;code&gt;pre-commit&lt;/code&gt; hook file and add the code that iterates over all the js files and makes them &amp;quot;pretty&amp;quot;.&lt;br&gt;
+&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;
+jsfiles=$(git diff --cached --name-only --diff-filter=ACM | grep &amp;#39;.jsx\?$&amp;#39; | tr &amp;#39;\n&amp;#39; &amp;#39; &amp;#39;)
+[ -z &amp;quot;$jsfiles&amp;quot; ] &amp;amp;&amp;amp; exit 0&lt;br /&gt;
+# Prettify all staged .js files
+echo &amp;quot;$jsfiles&amp;quot; | xargs ./node_modules/.bin/prettier --write&lt;br /&gt;
+# Add back the modified/prettified files to staging
+echo &amp;quot;$jsfiles&amp;quot; | xargs git add
+exit 0
+&lt;/code&gt;&lt;/pre&gt;
+We aren&amp;#39;t doing anything fancy here, just copy pasting the code from docs.&lt;/li&gt;
+&lt;li&gt;Above I showed you a how you can do it for javascript, but you can achive the same using respective modules in your programming language.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;custom notification system for push&lt;/strong&gt;&lt;br&gt;
+The last usecase we&amp;#39;ll be talking about is custom notifications on &lt;code&gt;git push&lt;/code&gt;, as I explained earlier this could be used for send notifications when git repo is in local network or if not using git based platforms like &lt;a href=&quot;https://github.com/&quot;&gt;Github&lt;/a&gt;. Let&amp;#39;s do this..&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Firebase is another product I use in many of my projects. It&amp;#39;s like a swiss army knife for app developers, It&amp;#39;s got it all in it&amp;#39;s pockets.. whether it&amp;#39;s realtime database, storage, push notifications, analytics or cloud functions.(what else could you ask for!)&lt;/li&gt;
+&lt;li&gt;For this we&amp;#39;ll need two of firebase products &lt;code&gt;realtime database&lt;/code&gt; and &lt;code&gt;firebase functions&lt;/code&gt;, &lt;code&gt;firebase function&lt;/code&gt; Implementation would be out of scope of this blog post. Neither will I tell you how to setup the firebase project, The only firebase part we&amp;#39;ll be talking about is how you can add data to &lt;code&gt;firebase realtime database&lt;/code&gt; using REST API from Git Hook.&lt;br&gt;
+Hey Man! This is not fair, now I have to learn about a whole new platform just to see how a &lt;code&gt;git push hook&lt;/code&gt; work?&lt;br&gt;
+Don&amp;#39;t worry! since we&amp;#39;ll be using &lt;code&gt;curl&lt;/code&gt; to add data to database using REST API, you can use the same knowledge with any other platform.&lt;/li&gt;
+&lt;li&gt;Create a new file &lt;code&gt;post-push&lt;/code&gt;(again with no extension), and save it in the hooks directory. Add the &lt;code&gt;#!/bin/sh&lt;/code&gt; header and save it.&lt;/li&gt;
+&lt;li&gt;You all know what &lt;a href=&quot;https://curl.haxx.se/&quot;&gt;curl&lt;/a&gt; is right ? Now we&amp;#39;ll send a json object with the name of the author and time of push to the &lt;code&gt;firebase database&lt;/code&gt; REST API endpoint.
+&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;
+now=$(date +&amp;quot;%T-%d/%m/%Y&amp;quot;)&lt;br /&gt;
+curl -X PUT -d &amp;#39;{ &amp;quot;name&amp;quot;: &amp;quot;Pavitran&amp;quot;, &amp;quot;time&amp;quot;: &amp;quot;&amp;#39;&amp;quot;$now&amp;quot;&amp;#39;&amp;quot; }&amp;#39; \
+&amp;#39;https://git-hooks-15794.firebaseio.com/commits.json&amp;#39;
+&lt;/code&gt;&lt;/pre&gt;
+In the above code, we get the time, date and save in the &lt;code&gt;$now&lt;/code&gt; variable. Then using curl we Put json data with a &lt;code&gt;name&lt;/code&gt; and &lt;code&gt;time&lt;/code&gt; properly, to the endpoint &lt;code&gt;https://git-hooks-15794.firebaseio.com/commits.json&lt;/code&gt;. This will add the data to the &lt;code&gt;firebase database&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;Hey But wait, you said we were going to send a notification and all you did was add some data to the database?&lt;br&gt;
+Well I did, but Implementating the remaining part would be out of scope. But if you still want to, All you have to do is listen for changes in database from firebase function and send a notification through email. If you are interested you can checkout this example &lt;a href=&quot;https://github.com/firebase/functions-samples/tree/master/quickstarts/email-users&quot;&gt;email-users&lt;/a&gt;, where you can learn how to send an email using firebase function.&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;That was &lt;code&gt;Git Hooks&lt;/code&gt; in a nutshell, Do let me know your views on this piece. Also let me know if you got any inprovisations or suggestion in the comments below. That&amp;#39;s it for now, signing out!&lt;/p&gt;
+</content>
+ </entry>
+ 
+
+</feed>

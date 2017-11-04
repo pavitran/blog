@@ -1,0 +1,46 @@
+# Dependencies
+markdown:	redcarpet
+highlighter:	true
+
+# Permalinks
+permalink:	:title
+
+# Setup
+title:		Pavitran
+tagline:	'blog'
+description:	'My personal blog.'
+url:		http://pavitran.github.io/
+
+author:
+  name:		'Pavitran Kalla'
+  url:		https://google.com/+PavitranK
+
+paginate:	5
+
+# Custom vars
+icon:		/assets/images/pavitran.jpg
+cover:		/assets/images/cover.jpg
+
+social:
+  - icon:	twitter
+    url:	https://twitter.com/_pavitran
+    desc:	Follow me on twitter
+
+  - icon:	github
+    url:	https://github.com/pavitran
+    desc:	Fork me on github
+
+  - icon:	googleplus-alt
+    url:	https://google.com/+PavitranK
+    desc:	Add me on google+
+
+  - icon:	feed
+    url:	http://pavitran.github.io/blog/atom.xml
+    desc:	Subscribe to my feed
+
+plugins:
+  - jekyll-paginate
+
+menu:
+  - title:	Home
+    url:	/

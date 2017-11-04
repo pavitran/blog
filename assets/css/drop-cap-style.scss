@@ -1,0 +1,66 @@
+---
+---
+
+// specify font sizes here
+$font-size-mobile: 16px;
+$font-size-tablet: 18px;
+$font-size-desktop: 18px;
+$font-size-large-desktop: 20px;
+
+// specify breakpoints here
+$width-tablet: 780px;
+$width-desktop: 970px;
+$width-large-desktop: 1170px;
+
+// handy breakpoint mixin
+@mixin bp($point) {
+  @if $point == tablet {
+    @media (min-width: $width-tablet) {
+      @content;
+    }
+  } @else if $point == desktop {
+    @media (min-width: $width-desktop) {
+      @content;
+    }
+  } @else if $point == large-desktop {
+    @media (min-width: $width-large-desktop) {
+      @content;
+    }
+  }
+}
+
+// adjusts the drop cap font-size and line-height
+// each dropcap should align with the line height / baseline of each row
+@mixin dropcap-size($font-size, $drop-cap-height: 3, $line-height: 1.6) {
+  font-size: floor(($font-size * $line-height)) * $drop-cap-height * 1.20;
+  line-height: floor(($font-size * $line-height)) *  $drop-cap-height;
+}
+
+@mixin dropcaps($font-family: Georgia) {
+  float: left;
+  padding: 0px 10px 0px 0px;
+  font-family: $font-family;
+  @include dropcap-size($font-size-mobile);
+
+  @include bp(tablet) {
+    @include dropcap-size($font-size-tablet);
+  }
+  @include bp(desktop) {
+    @include dropcap-size($font-size-desktop);
+  }
+  @include bp(large-desktop) {
+    @include dropcap-size($font-size-large-desktop);
+  }
+}
+
+// this is the output css class used in the html above
+#article > p:first-child:first-letter {
+  @include dropcaps();
+}
+
+// hacky but firefox requires top padding to align with the baseline
+@-moz-document url-prefix() {
+  #article > p:first-child:first-letter {
+    padding: 10px 10px 0px 0px;
+  }
+}

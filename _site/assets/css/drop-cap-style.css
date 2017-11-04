@@ -1,0 +1,22 @@
+#article > p:first-child:first-letter {
+  float: left;
+  padding: 0px 10px 0px 0px;
+  font-family: Georgia;
+  font-size: 90px;
+  line-height: 75px; }
+  @media (min-width: 780px) {
+    #article > p:first-child:first-letter {
+      font-size: 100.8px;
+      line-height: 84px; } }
+  @media (min-width: 970px) {
+    #article > p:first-child:first-letter {
+      font-size: 100.8px;
+      line-height: 84px; } }
+  @media (min-width: 1170px) {
+    #article > p:first-child:first-letter {
+      font-size: 115.2px;
+      line-height: 96px; } }
+
+@-moz-document url-prefix() {
+  #article > p:first-child:first-letter {
+    padding: 10px 10px 0px 0px; } }
