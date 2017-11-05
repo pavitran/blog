@@ -4,7 +4,7 @@
  <title>Pavitran</title>
  <link href="http://localhost:4000/atom.xml" rel="self"/>
  <link href="http://localhost:4000/"/>
- <updated>2017-11-05T23:43:18+05:30</updated>
+ <updated>2017-11-06T00:22:31+05:30</updated>
  <id>http://localhost:4000</id>
  <author>
    <name>Pavitran Kalla</name>
@@ -67,48 +67,36 @@ Now let’s take the use cases from above and let’s write three different &lt;
   &lt;li&gt;&lt;strong&gt;Different credentials for dev and production&lt;/strong&gt;&lt;br /&gt;
   I usually have different credentials file for dev and production, let’s call them &lt;code&gt;credentials.json&lt;/code&gt; and &lt;code&gt;credentials-dev.json&lt;/code&gt;. Now we usually have to switch them before commiting the code, let’s automate it with hooks..
     &lt;ul&gt;
-      &lt;li&gt;In the current &lt;code&gt;hooks&lt;/code&gt; directory you’d have a file with the name &lt;code&gt;pre-commit.sample&lt;/code&gt;, remove the &lt;code&gt;.sample&lt;/code&gt; extension, save and open up the file in your favourite text editor. You should see some sample bash script, let’s ignore it for now and remove all the content’s of the file(except the &lt;code&gt;#!/bin/sh&lt;/code&gt;). Now let’s assume you are working with a node project and in your project directory have a &lt;code&gt;index.js&lt;/code&gt; file, this is the file in which we require the credentials. Let’s switch the occurances of &lt;code&gt;credentials-dev.json&lt;/code&gt; with &lt;code&gt;credentials.json&lt;/code&gt; using sed..&lt;/li&gt;
-    &lt;/ul&gt;
-    &lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;
- sed -i &quot;s/credentials-dev.json/credentials.json/g&quot; ./src/index.js  
- git add ./src/index.js  
-  &lt;/code&gt;&lt;/pre&gt;
-    &lt;p&gt;This would replace all the occurance of our dev credentials with production credentials, and the next line &lt;code&gt;git add ./src/index.js&lt;/code&gt; to add the chaged file back to the staging, you could do &lt;code&gt;git add .&lt;/code&gt; if you are updating multiple files in the hooks. Save it, try commiting the code and you should see the changes in the file.&lt;/p&gt;
-    &lt;ul&gt;
-      &lt;li&gt;We just switched the credentials to production, but wait again for development you have to switch them back manually, seems inefficient🤔. Let’s improvise it. Create a new hook that changes back the production credentials to dev, in same &lt;code&gt;hooks&lt;/code&gt; directory create a new file &lt;code&gt;post-commit&lt;/code&gt;(without any extension). open the file in editor and add &lt;code&gt;#!/bin/sh&lt;/code&gt; on top, again just one line which does the exact opposite.&lt;/li&gt;
+      &lt;li&gt;In the current &lt;code&gt;hooks&lt;/code&gt; directory you’d have a file with the name &lt;code&gt;pre-commit.sample&lt;/code&gt;, remove the &lt;code&gt;.sample&lt;/code&gt; extension, save and open up the file in your favourite text editor. You should see some sample bash script, let’s ignore it for now and remove all the content’s of the file(except the &lt;code&gt;#!/bin/sh&lt;/code&gt;). Now let’s assume you are working with a node project and in your project directory have a &lt;code&gt;index.js&lt;/code&gt; file, this is the file in which we require the credentials. Let’s switch the occurances of &lt;code&gt;credentials-dev.json&lt;/code&gt; with &lt;code&gt;credentials.json&lt;/code&gt; using sed..
+        &lt;pre&gt;&lt;code&gt;  sed -i &quot;s/credentials-dev.json/credentials.json/g&quot; ./src/index.js  
+  git add ./src/index.js  
+&lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;This would replace all the occurance of our dev credentials with production credentials, and the next line &lt;code&gt;git add ./src/index.js&lt;/code&gt; to add the chaged file back to the staging, you could do &lt;code&gt;git add .&lt;/code&gt; if you are updating multiple files in the hooks. Save it, try commiting the code and you should see the changes in the file.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li&gt;We just switched the credentials to production, but wait again for development you have to switch them back manually, seems inefficient🤔. Let’s improvise it. Create a new hook that changes back the production credentials to dev, in same &lt;code&gt;hooks&lt;/code&gt; directory create a new file &lt;code&gt;post-commit&lt;/code&gt;(without any extension). open the file in editor and add &lt;code&gt;#!/bin/sh&lt;/code&gt; on top, again just one line which does the exact opposite.
+        &lt;pre&gt;&lt;code&gt;  sed -i &quot;s/credentials.json/credentials-dev.json/g&quot; ./src/index.js
+&lt;/code&gt;&lt;/pre&gt;
+      &lt;/li&gt;
+      &lt;li&gt;That’s all, try commiting the code and you should see no changes in the &lt;code&gt;index.js&lt;/code&gt;. Why? Because even though we change it before the commit with &lt;code&gt;pre-commit&lt;/code&gt; hook, we changed it back with &lt;code&gt;post-commit&lt;/code&gt; hook. Do a quick &lt;code&gt;git diff&lt;/code&gt; and you should see that the last commit really did change to production credentials.&lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li&gt;
-&lt;/ol&gt;
-&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;
-  sed -i &quot;s/credentials.json/credentials-dev.json/g&quot; ./src/index.js
-  &lt;/code&gt;&lt;/pre&gt;
-&lt;ul&gt;
-  &lt;li&gt;That’s all, try commiting the code and you should see no changes in the &lt;code&gt;index.js&lt;/code&gt;. Why? Because even though we change it before the commit with &lt;code&gt;pre-commit&lt;/code&gt; hook, we changed it back with &lt;code&gt;post-commit&lt;/code&gt; hook. Do a quick &lt;code&gt;git diff&lt;/code&gt; and you should see that the last commit really did change to production credentials.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;ol&gt;
   &lt;li&gt;&lt;strong&gt;Prettifying code before committing&lt;/strong&gt;&lt;br /&gt;
 This is another common one, I sometimes start with the prittiest code possible and as I progress it turns into something else. Let’s use a &lt;code&gt;pre-commit&lt;/code&gt; hook for this
     &lt;ul&gt;
-      &lt;li&gt;Since we are working with node, there’s an awesome node module &lt;a href=&quot;https://github.com/prettier/prettier#option-3-bash-script&quot;&gt;prettier&lt;/a&gt;, that makes all your javascript prettier. install it with &lt;code&gt;npm install --save-dev --save-exact prettier&lt;/code&gt;, now let’s go to our &lt;code&gt;pre-commit&lt;/code&gt; hook file and add the code that iterates over all the js files and makes them “pretty”.&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;
-jsfiles=$(git diff --cached --name-only --diff-filter=ACM | grep '\.jsx\?$' | tr '\n' ' ')
-[ -z &quot;$jsfiles&quot; ] &amp;amp;&amp;amp; exit 0&lt;br /&gt;
+      &lt;li&gt;Since we are working with node, there’s an awesome node module &lt;a href=&quot;https://github.com/prettier/prettier#option-3-bash-script&quot;&gt;prettier&lt;/a&gt;, that makes all your javascript prettier. install it with &lt;code&gt;npm install --save-dev --save-exact prettier&lt;/code&gt;, now let’s go to our &lt;code&gt;pre-commit&lt;/code&gt; hook file and add the code that iterates over all the js files and makes them “pretty”.
+        &lt;pre&gt;&lt;code&gt;jsfiles=$(git diff --cached --name-only --diff-filter=ACM | grep '\.jsx\?$' | tr '\n' ' ')
+[ -z &quot;$jsfiles&quot; ] &amp;amp;&amp;amp; exit 0
 # Prettify all staged .js files
-echo &quot;$jsfiles&quot; | xargs ./node_modules/.bin/prettier --write&lt;br /&gt;
+echo &quot;$jsfiles&quot; | xargs ./node_modules/.bin/prettier --write
 # Add back the modified/prettified files to staging
 echo &quot;$jsfiles&quot; | xargs git add
 exit 0
 &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;We aren’t doing anything fancy here, just copy pasting the code from docs.&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;Above I showed you a how you can do it for javascript, but you can achive the same using respective modules in your programming language.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;ol&gt;
+        &lt;p&gt;We aren’t doing anything fancy here, just copy pasting the code from docs.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li&gt;Above I showed you a how you can do it for javascript, but you can achive the same using respective modules in your programming language.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
   &lt;li&gt;&lt;strong&gt;custom notification system for push&lt;/strong&gt;&lt;br /&gt;
 The last usecase we’ll be talking about is custom notifications on &lt;code&gt;git push&lt;/code&gt;, as I explained earlier this could be used for send notifications when git repo is in local network or if not using git based platforms like &lt;a href=&quot;https://github.com/&quot;&gt;Github&lt;/a&gt;. Let’s do this..
     &lt;ul&gt;
@@ -117,22 +105,20 @@ The last usecase we’ll be talking about is custom notifications on &lt;code&gt
   Hey Man! This is not fair, now I have to learn about a whole new platform just to see how a &lt;code&gt;git push hook&lt;/code&gt; work?&lt;br /&gt;
   Don’t worry! since we’ll be using &lt;code&gt;curl&lt;/code&gt; to add data to database using REST API, you can use the same knowledge with any other platform.&lt;/li&gt;
       &lt;li&gt;Create a new file &lt;code&gt;post-push&lt;/code&gt;(again with no extension), and save it in the hooks directory. Add the &lt;code&gt;#!/bin/sh&lt;/code&gt; header and save it.&lt;/li&gt;
-      &lt;li&gt;You all know what &lt;a href=&quot;https://curl.haxx.se/&quot;&gt;curl&lt;/a&gt; is right ? Now we’ll send a json object with the name of the author and time of push to the &lt;code&gt;firebase database&lt;/code&gt; REST API endpoint.&lt;/li&gt;
+      &lt;li&gt;You all know what &lt;a href=&quot;https://curl.haxx.se/&quot;&gt;curl&lt;/a&gt; is right ? Now we’ll send a json object with the name of the author and time of push to the &lt;code&gt;firebase database&lt;/code&gt; REST API endpoint.
+        &lt;pre&gt;&lt;code&gt; now=$(date +&quot;%T-%d/%m/%Y&quot;)&amp;lt;br /&amp;gt;
+ curl -X PUT -d '{ &quot;name&quot;: &quot;Pavitran&quot;, &quot;time&quot;: &quot;'&quot;$now&quot;'&quot; }' \
+   'https://git-hooks-15794.firebaseio.com/commits.json'
+&lt;/code&gt;&lt;/pre&gt;
+        &lt;p&gt;In the above code, we get the time, date and save in the &lt;code&gt;$now&lt;/code&gt; variable. Then using curl we Put json data with a &lt;code&gt;name&lt;/code&gt; and &lt;code&gt;time&lt;/code&gt; properly, to the endpoint &lt;code&gt;https://git-hooks-15794.firebaseio.com/commits.json&lt;/code&gt;. This will add the data to the &lt;code&gt;firebase database&lt;/code&gt;.&lt;/p&gt;
+      &lt;/li&gt;
+      &lt;li&gt;Hey But wait, you said we were going to send a notification and all you did was add some data to the database?&lt;br /&gt;
+  Well I did, but Implementating the remaining part would be out of scope. But if you still want to, All you have to do is listen for changes in database from firebase function and send a notification through email. If you are interested you can checkout this example &lt;a href=&quot;https://github.com/firebase/functions-samples/tree/master/quickstarts/email-users&quot;&gt;email-users&lt;/a&gt;, where you can learn how to send an email using firebase function.&lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li&gt;
 &lt;/ol&gt;
-&lt;pre&gt;&lt;code class=&quot;bash&quot;&gt;
-  now=$(date +&quot;%T-%d/%m/%Y&quot;)&lt;br /&gt;
-  curl -X PUT -d '{ &quot;name&quot;: &quot;Pavitran&quot;, &quot;time&quot;: &quot;'&quot;$now&quot;'&quot; }' \
-    'https://git-hooks-15794.firebaseio.com/commits.json'
-  &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;In the above code, we get the time, date and save in the &lt;code&gt;$now&lt;/code&gt; variable. Then using curl we Put json data with a &lt;code&gt;name&lt;/code&gt; and &lt;code&gt;time&lt;/code&gt; properly, to the endpoint &lt;code&gt;https://git-hooks-15794.firebaseio.com/commits.json&lt;/code&gt;. This will add the data to the &lt;code&gt;firebase database&lt;/code&gt;.&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;Hey But wait, you said we were going to send a notification and all you did was add some data to the database?&lt;br /&gt;
-  Well I did, but Implementating the remaining part would be out of scope. But if you still want to, All you have to do is listen for changes in database from firebase function and send a notification through email. If you are interested you can checkout this example &lt;a href=&quot;https://github.com/firebase/functions-samples/tree/master/quickstarts/email-users&quot;&gt;email-users&lt;/a&gt;, where you can learn how to send an email using firebase function.&lt;/li&gt;
-&lt;/ul&gt;
 
-&lt;p&gt;That was &lt;code&gt;Git Hooks&lt;/code&gt; in a nutshell, Do let me know your views on this piece. Also let me know if you got any inprovisations or suggestion in the comments below. That’s it for now, signing out!&lt;/p&gt;
+&lt;p&gt;That was &lt;code&gt;Git Hooks&lt;/code&gt; in a nutshell, Do let me know your views on this piece. Also let me know if you got any improvisations or suggestion in the comments below. That’s it for now, signing out!&lt;/p&gt;
 </content>
  </entry>
  

@@ -52,29 +52,29 @@ Now let's take the use cases from above and let's write three different `Git Hoo
 1. **Different credentials for dev and production**  
   I usually have different credentials file for dev and production, let's call them `credentials.json` and `credentials-dev.json`. Now we usually have to switch them before commiting the code, let's automate it with hooks..  
  - In the current `hooks` directory you'd have a file with the name `pre-commit.sample`, remove the `.sample` extension, save and open up the file in your favourite text editor. You should see some sample bash script, let's ignore it for now and remove all the content's of the file(except the `#!/bin/sh`). Now let's assume you are working with a node project and in your project directory have a `index.js` file, this is the file in which we require the credentials. Let's switch the occurances of `credentials-dev.json` with `credentials.json` using sed..  
-   <pre><code class="bash">
-    sed -i "s/credentials-dev.json/credentials.json/g" ./src/index.js  
-    git add ./src/index.js  
-  </code></pre>
+     ```
+        sed -i "s/credentials-dev.json/credentials.json/g" ./src/index.js  
+        git add ./src/index.js  
+      ```
   This would replace all the occurance of our dev credentials with production credentials, and the next line `git add ./src/index.js` to add the chaged file back to the staging, you could do `git add .` if you are updating multiple files in the hooks. Save it, try commiting the code and you should see the changes in the file.  
  - We just switched the credentials to production, but wait again for development you have to switch them back manually, seems inefficient🤔. Let's improvise it. Create a new hook that changes back the production credentials to dev, in same `hooks` directory create a new file `post-commit`(without any extension). open the file in editor and add `#!/bin/sh` on top, again just one line which does the exact opposite.  
-  <pre><code class="bash">
+  ```
   sed -i "s/credentials.json/credentials-dev.json/g" ./src/index.js
-  </code></pre>
+  ```
  - That's all, try commiting the code and you should see no changes in the `index.js`. Why? Because even though we change it before the commit with `pre-commit` hook, we changed it back with `post-commit` hook. Do a quick `git diff` and you should see that the last commit really did change to production credentials.  
 
-2. **Prettifying code before committing**  
+ 2. **Prettifying code before committing**  
 This is another common one, I sometimes start with the prittiest code possible and as I progress it turns into something else. Let's use a `pre-commit` hook for this
  - Since we are working with node, there's an awesome node module [prettier](https://github.com/prettier/prettier#option-3-bash-script), that makes all your javascript prettier. install it with `npm install --save-dev --save-exact prettier`, now let's go to our `pre-commit` hook file and add the code that iterates over all the js files and makes them "pretty".  
-<pre><code class="bash">
+```
 jsfiles=$(git diff --cached --name-only --diff-filter=ACM | grep '\.jsx\?$' | tr '\n' ' ')
-[ -z "$jsfiles" ] && exit 0<br />
+[ -z "$jsfiles" ] && exit 0
 # Prettify all staged .js files
-echo "$jsfiles" | xargs ./node_modules/.bin/prettier --write<br />
+echo "$jsfiles" | xargs ./node_modules/.bin/prettier --write
 # Add back the modified/prettified files to staging
 echo "$jsfiles" | xargs git add
 exit 0
-</code></pre>
+```
 We aren't doing anything fancy here, just copy pasting the code from docs.
   - Above I showed you a how you can do it for javascript, but you can achive the same using respective modules in your programming language.
 
@@ -85,14 +85,14 @@ The last usecase we'll be talking about is custom notifications on `git push`, a
   Hey Man! This is not fair, now I have to learn about a whole new platform just to see how a `git push hook` work?  
   Don't worry! since we'll be using `curl` to add data to database using REST API, you can use the same knowledge with any other platform.
   - Create a new file `post-push`(again with no extension), and save it in the hooks directory. Add the `#!/bin/sh` header and save it.
-  - You all know what [curl](https://curl.haxx.se/) is right ? Now we'll send a json object with the name of the author and time of push to the `firebase database` REST API endpoint.
-  <pre><code class="bash">
-  now=$(date +"%T-%d/%m/%Y")<br />
-  curl -X PUT -d '{ "name": "Pavitran", "time": "'"$now"'" }' \
-    'https://git-hooks-15794.firebaseio.com/commits.json'
-  </code></pre>
-  In the above code, we get the time, date and save in the `$now` variable. Then using curl we Put json data with a `name` and `time` properly, to the endpoint `https://git-hooks-15794.firebaseio.com/commits.json`. This will add the data to the `firebase database`.
+  - You all know what [curl](https://curl.haxx.se/) is right ? Now we'll send a json object with the name of the author and time of push to the `firebase database` REST API endpoint.  
+    ```
+    now=$(date +"%T-%d/%m/%Y")<br />
+    curl -X PUT -d '{ "name": "Pavitran", "time": "'"$now"'" }' \
+      'https://git-hooks-15794.firebaseio.com/commits.json'
+    ```  
+    In the above code, we get the time, date and save in the `$now` variable. Then using curl we Put json data with a `name` and `time` properly, to the endpoint `https://git-hooks-15794.firebaseio.com/commits.json`. This will add the data to the `firebase database`.
   - Hey But wait, you said we were going to send a notification and all you did was add some data to the database?  
   Well I did, but Implementating the remaining part would be out of scope. But if you still want to, All you have to do is listen for changes in database from firebase function and send a notification through email. If you are interested you can checkout this example [email-users](https://github.com/firebase/functions-samples/tree/master/quickstarts/email-users), where you can learn how to send an email using firebase function.
 
-  That was `Git Hooks` in a nutshell, Do let me know your views on this piece. Also let me know if you got any inprovisations or suggestion in the comments below. That's it for now, signing out!
+  That was `Git Hooks` in a nutshell, Do let me know your views on this piece. Also let me know if you got any improvisations or suggestion in the comments below. That's it for now, signing out!
