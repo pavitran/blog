@@ -3,7 +3,7 @@ layout: post
 comments: true
 title: "Hooking up with Git Hooks"
 quote: Don't wanna get hooked? be the fish that swims in solitude
-image: /blog/media/2017-10-29-hooking-up-with-git-hooks/git-cozy.jpg
+image: /blog/media/2017-10-29-hooking-up-with-git-hooks/git.png
 video: false
 ---
 Even though the title is a bit weird, you might have already guessed what this article is about. Yeah, "Git" Sometimes no matter how much you explore a tool or a software, there are still surprises in its pocket. One such tool is Git. Yup, the nifty Version Control System(VSC) which is most popular and most used among software developer(the smart ones), It might have saved lots of butts from getting busted, at least it did save mine a lot. Don't know how many lives those `git reset`,`git revert` and `git checkout` has saved.
